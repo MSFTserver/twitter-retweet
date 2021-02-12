@@ -1,0 +1,25 @@
+{
+  "name": "twitter-retweet",
+  "version": "1.0.0",
+  "description": "retweet and like the contents of a twitter list based on keywords to reject and accept certain tweets.",
+  "keywords": "twitter,twitter bot,retweet,auto retweet,twitter list",
+  "homepage": "https://github.com/MSFTserver/twitter-retweet#readme",
+  "bugs": {
+    "url": "https://github.com/MSFTserver/twitter-retweet/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MSFTserver/twitter-retweet.git"
+  },
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "test": "set DEBUG=* & node test/test.js"
+  },
+  "author": "HostsServer",
+  "dependencies": {
+    "debug": "^4.3.1",
+    "dotenv": "^8.2.0",
+    "twit": "^2.2.11"
+  }
+}
