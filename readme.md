@@ -1,6 +1,6 @@
 # Twitter Retweet
 # Under-Construction
-This is a simple twitter bot, designed to retweet and like the contents of a twitter list.
+This is a simple twitter bot, designed to retweet and like the contents of a twitter list based on keywords to reject and accept certain tweets. 
 
 
 ## Setup Your Own
