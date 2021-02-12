@@ -4,6 +4,7 @@ let debug = require('debug')
 let derror = debug('ERROR:');
 let dreject = debug('REJECT:');
 let daccept = debug('ACCEPT:');
+let ddrop = debug('DROP:');
 let dlog = debug('LOG:');
 let dpass = debug('PASSED:');
 let config = {
@@ -21,6 +22,7 @@ let config = {
 let accepted = 0;
 let rejected = 0;
 let users = 0;
+let dropped = 0;
 if (!config.keys.consumer_key){
   dlog("no CONSUMER_KEY found in Environmental Variables")
   dlog("please set up the .env to run the test")
@@ -69,6 +71,7 @@ function startListen() {
       dpass('total Users Watched From List: '+users)
       dpass('total Accepted Tweets: '+accepted)
       dpass('total Rejected Tweets: '+rejected)
+      dpass('total Dropped Tweets: '+dropped)
     },10000)
   });
 
@@ -94,6 +97,7 @@ function startListen() {
       }
       const accept = tweetText.split(" ").some(r=> config.tweetAccept.split(",").indexOf(r) >= 0);
       const reject = tweetText.split(" ").some(r=> config.tweetReject.split(",").indexOf(r) >= 0);
+      dlog(accept,reject);
       if (accept && !reject){
         daccept('passsed ACCEPT and REJECT filters')
         daccept('   '+tweetText)
@@ -104,14 +108,17 @@ function startListen() {
         rejected++
       }
     } else {
-      dreject('is reply and retweeted')
-      dreject('   '+tweetText)
-      rejected++
+      ddrop('is reply and retweeted')
+      ddrop('   '+tweetText)
+      dropped++
     }
   });
 
+  stream.on('limit', function(err){
+  	derror(err)
+  });
+
   stream.on('error', function(err){
-    derror("")
   	derror(err)
   });
 
