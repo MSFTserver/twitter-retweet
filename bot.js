@@ -99,16 +99,32 @@ function startListen(users) {
         //checks if tweetText contains any words from Rejected words list
         const reject = tweetText.split(" ").some(r=> config.tweetReject.split(",").indexOf(r) >= 0);
         // runs if output [true,false]
+        console.log(accept,reject)
         if (accept && !reject){
+          console.log('Accept')
           console.log(tweet)
           console.log(tweetID)
           console.log(tweetText)
           //console.log("Retweeted User ["+tweet.user.name + "]: " + tweet.text);
-          /*T.post('statuses/retweet/:id', { id: tweet.id_str }, function (err, data, response) {
+          T.post('statuses/retweet/:id', { id: tweetID }, function (err, data, response) {
             console.log(data)
-          })*/
+          })
+          T.post('favorites/create/:id', { id: tweetID }, function (err, data, response) {
+            console.log(data)
+          })
+        } else {
+          console.log('reject2')
+          console.log(tweet)
+          console.log(tweetID)
+          console.log(tweetText)
         }
       }
+  });
+
+  // watches limit event
+  // fires when the stream hits rate limits
+  stream.on('limit', function(err){
+  	console.log(err)
   });
 
   // watches error event
