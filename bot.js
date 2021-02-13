@@ -108,12 +108,11 @@ function startListen(users) {
         //checks if tweetText contains any words from Rejected words list
         let regexReject = new RegExp(config.regexReject, 'gi');
         const reject = regexReject.test(tweetText)
-        // runs if output [true,false]
-        console.log(accept,reject)
         if (accept && !reject){
-          //console.log("Retweeted User ["+tweet.user.name + "]: " + tweet.text);
+          // Attempts to retweet by ID
           T.post('statuses/retweet/:id', { id: tweetID }, function (err, data, response) {
             if(!err){
+              // Attempts to Favorite by ID
               T.post('favorites/create', { id: tweetID }, function (err, data, response) {
                 if(!err){
                   console.log('Retweeted '+tweetUser+': '+tweetText);
