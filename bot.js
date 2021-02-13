@@ -4,8 +4,8 @@ let ascii = require('./ascii.js'); // import snazy ascii art console outputs
 let config = {
     me: process.env.ACCOUNTNAME, // The authorized account with a list to retweet.
     myList: process.env.LISTID, // The list we want to retweet.
-    tweetAccept: process.env.ACCEPT, // Accept only tweets matching this regex pattern.
-    tweetReject: process.env.REJECT, // AND reject any tweets matching this regex pattern.
+    regexAccept: process.env.ACCEPT, // Accept only tweets matching this regex pattern.
+    regexReject: process.env.REJECT, // AND reject any tweets matching this regex pattern.
     keys: { //BOT KEYS FOR TWITTER
         consumer_key: process.env.CONSUMER_KEY,
         consumer_secret: process.env.CONSUMER_SECRET,
@@ -66,6 +66,12 @@ function startListen(users) {
     '          / /|: Users |'+'\n'+
     ascii.rocketConnectedBottom
     console.log(rocketConnected)
+    setTimeout(()=>{
+      console.log(ascii.disconnected)
+      console.log('Checking list for new passengers')
+      stream.stop()
+      getListMembers();
+    },1800000)
   });
 
   // watches tweet event
@@ -73,6 +79,7 @@ function startListen(users) {
   stream.on('tweet', function (tweet) {
     let tweetText = tweet.text;
     let tweetID = tweet.id_str;
+    let tweetUser = tweet.user.name;
       // checks if tweet author is on users list.
       // checks if tweet is a in_reply_to_user_id_str
       // checks if tweet has already been retweeted
@@ -88,6 +95,7 @@ function startListen(users) {
         if(tweet.retweeted_status){
           tweetID = tweet.retweeted_status.id_str;
           tweetText = tweet.retweeted_status.text;
+          tweetUser = tweet.retweeted_status.user.name;
           // checks if tweet is truncated to a char limit.
           // if output [true] sets tweet text to extended version.
           if(tweet.retweeted_status.truncated){
@@ -95,28 +103,30 @@ function startListen(users) {
           }
         }
         //checks if tweetText contains any words from Accepted words list
-        const accept = tweetText.split(" ").some(r=> config.tweetAccept.split(",").indexOf(r) >= 0);
+        let regexAccept = new RegExp(config.regexAccept, 'gi');
+        const accept = regexAccept.test(tweetText);
         //checks if tweetText contains any words from Rejected words list
-        const reject = tweetText.split(" ").some(r=> config.tweetReject.split(",").indexOf(r) >= 0);
+        let regexReject = new RegExp(config.regexReject, 'gi');
+        const reject = regexReject.test(tweetText)
         // runs if output [true,false]
         console.log(accept,reject)
         if (accept && !reject){
-          console.log('Accept')
-          console.log(tweet)
-          console.log(tweetID)
-          console.log(tweetText)
           //console.log("Retweeted User ["+tweet.user.name + "]: " + tweet.text);
           T.post('statuses/retweet/:id', { id: tweetID }, function (err, data, response) {
-            console.log(data)
+            if(!err){
+              T.post('favorites/create', { id: tweetID }, function (err, data, response) {
+                if(!err){
+                  console.log('Retweeted '+tweetUser+': '+tweetText);
+                } else {
+                  console.log('Favorite Failed!');
+                  console.log(err);
+                }
+              })
+            } else {
+              console.log('Retweet Failed!');
+              console.log(err);
+            }
           })
-          T.post('favorites/create/:id', { id: tweetID }, function (err, data, response) {
-            console.log(data)
-          })
-        } else {
-          console.log('reject2')
-          console.log(tweet)
-          console.log(tweetID)
-          console.log(tweetText)
         }
       }
   });

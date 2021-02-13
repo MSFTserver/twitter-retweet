@@ -8,15 +8,15 @@ let ddrop = debug('DROP:');
 let dlog = debug('LOG:');
 let dpass = debug('PASSED:');
 let config = {
-    me: process.env.ACCOUNTNAME,
-    myList: process.env.LISTID,
-    tweetAccept: 'bot,twitter,sleep,wierd,word,to,just,one',
-    tweetReject: 'test',
+    me: process.env.TESTACCOUNTNAME,
+    myList: process.env.TESTLISTID,
+    regexAccept: process.env.TESTACCEPT,
+    regexReject: process.env..TESTREJECT,
     keys: {
-        consumer_key: process.env.CONSUMER_KEY,
-        consumer_secret: process.env.CONSUMER_SECRET,
-        access_token: process.env.ACCESS_TOKEN_KEY,
-        access_token_secret: process.env.ACCESS_TOKEN_SECRET
+        consumer_key: process.env.TESTCONSUMER_KEY,
+        consumer_secret: process.env.TESTCONSUMER_SECRET,
+        access_token: process.env.TESTACCESS_TOKEN_KEY,
+        access_token_secret: process.env.TESTACCESS_TOKEN_SECRET
     }
 };
 let accepted = 0;
@@ -95,13 +95,30 @@ function startListen() {
           tweetText = tweet.retweeted_status.extended_tweet.full_text;
         }
       }
-      const accept = tweetText.split(" ").some(r=> config.tweetAccept.split(",").indexOf(r) >= 0);
-      const reject = tweetText.split(" ").some(r=> config.tweetReject.split(",").indexOf(r) >= 0);
+      let regexAccept = new RegExp(config.regexAccept, 'gi');
+      const accept = regexAccept.test(tweetText);
+      let regexReject = new RegExp(config.regexReject, 'gi');
+      const reject = regexReject.test(tweetText)
       dlog(accept,reject);
       if (accept && !reject){
         daccept('passsed ACCEPT and REJECT filters')
         daccept('   '+tweetText)
-        accepted++
+        T.post('statuses/retweet/:id', { id: tweetID }, function (err, data, response) {
+          if(!err){
+            T.post('favorites/create', { id: tweetID }, function (err, data, response) {
+              if(!err){
+                daccept('Retweeted '+tweetUser+': '+tweetText);
+                accepted++
+              } else {
+                derror('Favorite Failed!');
+                derror(err);
+              }
+            })
+          } else {
+            derror('Retweet Failed!');
+            derror(err);
+          }
+        })
       } else {
         dreject('did NOT pass ACCEPT and REJECT filters')
         dreject('   '+tweetText)
