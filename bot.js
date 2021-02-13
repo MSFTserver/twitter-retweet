@@ -21,7 +21,8 @@ function getListMembers() {
     console.log('Checking Boarding Passes...\n');
 	T.get('lists/members',{
     owner_screen_name: config.me,
-    list_id: config.myList
+    list_id: config.myList,
+	count: 5000 //max limit default is 20
   },
     function(error, data){
         if (!error) {
