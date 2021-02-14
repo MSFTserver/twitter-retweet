@@ -22,4 +22,6 @@ It will also pipe in tweets from the statuses/sample API for 30 seconds running 
 3. Run script with `npm run test`
 
 ## Credit
-Twitter Retweet is written in [node.js](http://nodejs.org/) using the [twit API client](https://www.npmjs.com/package/twit)
+Twitter Retweet is written in [node.js](http://nodejs.org/)
+
+This project was originally forked from [twitter-listbot](https://github.com/bryanbraun/twitter-listbot) changing the API client to [twit](https://www.npmjs.com/package/twit) for more error handling and other small changes.
