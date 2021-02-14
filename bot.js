@@ -119,7 +119,7 @@ function startListen(users) {
       // checks if the tweet has any keywords we dont want
       // checks if the tweet has already been retweeted
       // if output [true,false,false] retweet and like status
-      if (accept && !reject && !retweet){
+      if (accept && !reject && !retweeted){
         // Attempts to retweet by ID
         T.post('statuses/retweet/:id', { id: tweetID }, function (err, data, response) {
           if(!err){
