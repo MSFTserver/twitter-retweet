@@ -79,6 +79,7 @@ function startListen() {
     let tweetText = tweet.text;
     let tweetID = tweet.id_str;
     let tweetUser = tweet.user.name;
+    let retweeted = false;
     if (!tweet.in_reply_to_user_id_str && !tweet.retweeted) {
       dlog('not a reply and not retweeted')
       if (tweet.truncated){
@@ -94,13 +95,17 @@ function startListen() {
           dlog('retweet from user is truncated text, grab text from extended_tweet object')
           tweetText = tweet.retweeted_status.extended_tweet.full_text;
         }
+        if(tweet.retweeted_status.retweeted){
+          dlog('retweet from user has aready been retweeted by us set retweeted to 1')
+          retweeted = true;
+        }
       }
       let regexAccept = new RegExp(config.regexAccept, 'gi');
       const accept = regexAccept.test(tweetText);
       let regexReject = new RegExp(config.regexReject, 'gi');
       const reject = regexReject.test(tweetText)
-      dlog(accept,reject);
-      if (accept && !reject){
+      dlog(accept,reject,retweeted);
+      if (accept && !reject && !retweeted){
         daccept('passsed ACCEPT and REJECT filters')
         daccept('   '+tweetText)
         T.post('statuses/retweet/:id', { id: tweetID }, function (err, data, response) {
