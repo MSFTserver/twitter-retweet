@@ -67,12 +67,6 @@ function startListen(users) {
     '          / /|: Users |'+'\n'+
     ascii.rocketConnectedBottom
     console.log(rocketConnected)
-    setTimeout(()=>{
-      console.log(ascii.disconnected)
-      console.log('Checking list for new passengers')
-      stream.stop()
-      getListMembers();
-    },1800000)
   });
 
   // watches tweet event
@@ -133,8 +127,15 @@ function startListen(users) {
               }
             })
           } else {
-            console.log('Retweet Failed!');
-            console.log(err);
+            // check error codes for 2 response types
+            // 327. You have already retweeted this Tweet.
+            //      The user cannot retweet the same Tweet more than once.
+            // 187. Status is a duplicate.
+            //      The status text has already been Tweeted by the authenticated account.
+            if (err.code != 327 || err.code != 187){
+              console.log('Retweet Failed!');
+              console.log(err);
+            }
           }
         })
       }
