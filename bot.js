@@ -120,7 +120,7 @@ function startListen(users) {
             // Attempts to Favorite by ID
             T.post('favorites/create', { id: tweetID }, function (err, data, response) {
               if(!err){
-                console.log('Retweeted '+tweetUser+': '+tweetText);
+                console.log('Retweeted '+tweetUser+': '+tweetText.replace('\n',' '));
               } else {
                 console.log('Favorite Failed!');
                 console.log(err);
@@ -132,7 +132,7 @@ function startListen(users) {
             //      The user cannot retweet the same Tweet more than once.
             // 187. Status is a duplicate.
             //      The status text has already been Tweeted by the authenticated account.
-            if (err.code != 327 || err.code != 187){
+            if (err.code != 327 && err.code != 187){
               console.log('Retweet Failed!');
               console.log(err);
             }
